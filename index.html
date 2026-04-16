@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SealUnion 表情包库</title>
+    
+    <!-- MDUI CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@1/dist/css/mdui.min.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body.mdui-theme-light {
+            background-color: #ffffff;
+            color: #212121;
+        }
+
+        body.mdui-theme-dark {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        .mdui-appbar {
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .mdui-appbar-scroll-hide {
+            transition: transform 0.3s ease;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 16px;
+        }
+
+        .header-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .search-container {
+            padding: 12px 8px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: inherit;
+        }
+
+        .mdui-theme-light .search-container {
+            background-color: #fafafa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .mdui-theme-dark .search-container {
+            background-color: #1e1e1e;
+            border-bottom: 1px solid #333333;
+        }
+
+        @media (min-width: 481px) {
+            .search-container {
+                padding: 16px;
+            }
+        }
+
+        .search-input-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 8px;
+        }
+
+        .mdui-text-field {
+            width: 100%;
+        }
+
+        .mdui-theme-light .mdui-text-field {
+            background-color: #ffffff;
+        }
+
+        .mdui-theme-dark .mdui-text-field {
+            background-color: #242424;
+        }
+
+        /* 暗色模式下的搜索框字体与图标优化 */
+        .mdui-theme-dark .search-input-wrapper .mdui-textfield-input {
+            color: #ffffff !important;
+        }
+
+        .mdui-theme-dark .search-input-wrapper .mdui-textfield-input::placeholder {
+            color: rgba(255, 255, 255, 0.5) !important;
+        }
+
+        .mdui-theme-dark .search-input-wrapper .mdui-icon {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        .mdui-theme-dark .search-input-wrapper .mdui-textfield-label {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        /* 搜索框聚焦状态优化 */
+        .mdui-theme-dark .search-input-wrapper .mdui-textfield.mdui-textfield-focus .mdui-textfield-label {
+            color: #e3f2fd !important;
+        }
+
+        .mdui-theme-dark .search-input-wrapper .mdui-textfield.mdui-textfield-focus .mdui-icon {
+            color: #e3f2fd !important;
+        }
+
+        /* 搜索框下划线颜色 */
+        .mdui-theme-dark .search-input-wrapper .mdui-textfield::after {
+            background-color: #64b5f6 !important;
+        }
+
+        .container {
+            max-width: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 16px 12px;
+        }
+
+        @media (min-width: 481px) {
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 16px;
+            }
+        }
+
+        .stats {
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        @media (min-width: 481px) {
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                gap: 8px;
+            }
+        }
+
+        .sticker-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            min-height: 140px;
+        }
+
+        .mdui-theme-light .sticker-card {
+            background-color: #f5f5f5;
+            border: 1px solid #e0e0e0;
+        }
+
+        .mdui-theme-dark .sticker-card {
+            background-color: #242424;
+            border: 1px solid #333333;
+        }
+
+        .sticker-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .mdui-theme-light .sticker-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .mdui-theme-dark .sticker-card:hover {
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.12);
+        }
+
+        .sticker-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 8px;
+            image-rendering: pixelated;
+        }
+
+        .sticker-label {
+            font-size: 12px;
+            text-align: center;
+            word-break: break-word;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 12px;
+            opacity: 0.6;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px 12px;
+            font-size: 12px;
+            opacity: 0.6;
+            margin-top: 24px;
+        }
+
+        @media (min-width: 481px) {
+            .empty-state {
+                padding: 48px 16px;
+            }
+
+            .footer {
+                padding: 24px 16px;
+            }
+        }
+
+        .mdui-theme-light .footer {
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .mdui-theme-dark .footer {
+            border-top: 1px solid #333333;
+        }
+
+        .toolbar-btn {
+            color: inherit !important;
+        }
+
+        /* Theme toggle button animation */
+        .theme-toggle-btn {
+            transition: transform 0.3s ease;
+        }
+
+        .theme-toggle-btn:active {
+            transform: rotate(180deg);
+        }
+
+        /* 模态对话框 */
+        .mdui-dialog {
+            max-width: 90vw;
+            max-height: 80vh;
+        }
+
+        .dialog-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            margin: 16px auto;
+            display: block;
+        }
+
+        .dialog-title {
+            font-size: 18px;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        /* Ripple effect */
+        .mdui-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Loading animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 48px 16px;
+        }
+
+        .mdui-spinner {
+            width: 40px;
+            height: 40px;
+        }
+    </style>
+</head>
+<body class="mdui-theme-light">
+
+    <!-- App Bar -->
+    <header class="mdui-appbar mdui-color-theme">
+        <div class="mdui-toolbar mdui-color-theme">
+            <div class="header-container">
+                <div class="header-title">SealUnion 表情包库</div>
+                <div class="header-actions">
+                    <button class="mdui-btn mdui-btn-icon toolbar-btn theme-toggle-btn" onclick="toggleTheme()" mdui-tooltip="{content: '切换主题'}">
+                        <i class="mdui-icon material-icons">brightness_4</i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <div class="search-input-wrapper">
+            <div class="mdui-text-field mdui-textfield mdui-textfield-floating-label">
+                <i class="mdui-icon material-icons">search</i>
+                <input class="mdui-textfield-input" type="text" id="searchInput" placeholder="搜索表情包...">
+                <label class="mdui-textfield-label">搜索表情包</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="stats">
+            <span id="statsText">加载中...</span>
+        </div>
+
+        <div id="loadingContainer" class="loading">
+            <div class="mdui-spinner"></div>
+        </div>
+
+        <div id="gridContainer" class="grid" style="display: none;"></div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">🔍</div>
+            <div>没有找到匹配的表情包</div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>© 2026 SealUnion 表情包库 | 使用 MDUI v1 构建</p>
+    </div>
+
+    <!-- Image Viewer Dialog -->
+    <div class="mdui-dialog" id="imageDialog">
+        <div class="mdui-dialog-title dialog-title" id="dialogTitle"></div>
+        <div class="mdui-dialog-content">
+            <img id="dialogImage" class="dialog-image" alt="表情包">
+        </div>
+        <div class="mdui-dialog-actions">
+            <button class="mdui-btn mdui-color-theme-accent" mdui-dialog-close>关闭</button>
+            <a id="downloadLink" class="mdui-btn mdui-color-theme-accent" download>下载</a>
+        </div>
+    </div>
+
+    <!-- MDUI JS -->
+    <script src="https://cdn.jsdelivr.net/npm/mdui@1/dist/js/mdui.min.js"></script>
+
+    <script>
+        // Global state
+        let allStickers = [];
+        let filteredStickers = [];
+        let isDarkMode = localStorage.getItem('theme') === 'dark';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            loadMetadata();
+        });
+
+        // Theme Management
+        function initTheme() {
+            if (isDarkMode) {
+                document.body.classList.remove('mdui-theme-light');
+                document.body.classList.add('mdui-theme-dark');
+                updateThemeIcon();
+            }
+        }
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            
+            if (isDarkMode) {
+                document.body.classList.remove('mdui-theme-light');
+                document.body.classList.add('mdui-theme-dark');
+            } else {
+                document.body.classList.remove('mdui-theme-dark');
+                document.body.classList.add('mdui-theme-light');
+            }
+            
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = document.querySelector('.theme-toggle-btn i');
+            icon.textContent = isDarkMode ? 'brightness_7' : 'brightness_4';
+        }
+
+        // Load Metadata
+        function loadMetadata() {
+            fetch('stickers_metadata.json')
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to load metadata');
+                    return response.json();
+                })
+                .then(data => {
+                    allStickers = Object.entries(data).map(([label, path], index) => ({
+                        id: index + 1,
+                        label,
+                        path
+                    }));
+                    filteredStickers = [...allStickers];
+                    renderStickers();
+                    document.getElementById('loadingContainer').style.display = 'none';
+                    document.getElementById('gridContainer').style.display = 'grid';
+                    updateStats();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('loadingContainer').innerHTML = 
+                        '<div style="text-align: center; padding: 48px;">加载失败，请刷新页面重试</div>';
+                });
+        }
+
+        // Render Stickers
+        function renderStickers() {
+            const gridContainer = document.getElementById('gridContainer');
+            gridContainer.innerHTML = '';
+
+            if (filteredStickers.length === 0) {
+                document.getElementById('gridContainer').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('emptyState').style.display = 'none';
+
+            filteredStickers.forEach(sticker => {
+                const card = document.createElement('div');
+                card.className = 'sticker-card mdui-ripple';
+                card.onclick = () => openImageDialog(sticker);
+                
+                card.innerHTML = `
+                    <img src="${sticker.path}" alt="${sticker.label}" class="sticker-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%2250%22 text-anchor=%22middle%22 font-size=%2240%22%3E?%3C/text%3E%3C/svg%3E'">
+                    <div class="sticker-label">${sticker.label}</div>
+                `;
+                
+                gridContainer.appendChild(card);
+            });
+
+            gridContainer.style.display = 'grid';
+        }
+
+        // Search Functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            
+            if (query === '') {
+                filteredStickers = [...allStickers];
+            } else {
+                filteredStickers = allStickers.filter(sticker => 
+                    sticker.label.toLowerCase().includes(query) ||
+                    sticker.id.toString().includes(query)
+                );
+            }
+
+            renderStickers();
+            updateStats();
+        });
+
+        // Update Stats
+        function updateStats() {
+            const total = allStickers.length;
+            const shown = filteredStickers.length;
+            const text = document.getElementById('searchInput').value.trim() === '' 
+                ? `共 ${total} 个表情包`
+                : `找到 ${shown} / ${total} 个表情包`;
+            document.getElementById('statsText').textContent = text;
+        }
+
+        // Image Dialog
+        function openImageDialog(sticker) {
+            document.getElementById('dialogTitle').textContent = sticker.label;
+            document.getElementById('dialogImage').src = sticker.path;
+            document.getElementById('downloadLink').href = sticker.path;
+            document.getElementById('downloadLink').download = `${sticker.id}_${sticker.label}.gif`;
+            
+            const dialog = document.getElementById('imageDialog');
+            const inst = new mdui.Dialog(dialog);
+            inst.open();
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + K 快速搜索
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+            // Ctrl/Cmd + Shift + L 切换主题
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'l') {
+                e.preventDefault();
+                toggleTheme();
+            }
+        });
+
+        // Service Worker for offline support (optional)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {
+                // Service Worker 注册失败，但不影响主功能
+            });
+        }
+    </script>
+</body>
+</html>
